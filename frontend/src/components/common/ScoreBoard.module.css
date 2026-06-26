@@ -1,0 +1,83 @@
+.wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+  background: var(--navy-800);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--navy-600);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--navy-700);
+}
+
+.row:last-child { border-bottom: none; }
+.row:first-child { background: var(--navy-700); }
+
+.teamCell {
+  width: 120px;
+  min-width: 120px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-right: 1px solid var(--navy-600);
+}
+
+.teamName {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.batMark {
+  color: var(--accent-gold);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.cell {
+  width: 36px;
+  min-width: 36px;
+  text-align: center;
+  padding: 8px 4px;
+  font-size: var(--font-sm);
+  border-right: 1px solid var(--navy-700);
+  color: var(--navy-100);
+}
+
+.cell.current {
+  background: var(--navy-600);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.total {
+  width: 40px;
+  min-width: 40px;
+  text-align: center;
+  padding: 8px 4px;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  border-left: 1px solid var(--navy-500);
+  color: var(--accent-gold);
+}
+
+.row:first-child .cell,
+.row:first-child .total,
+.row:first-child .teamCell {
+  color: var(--navy-200);
+  font-size: 12px;
+  font-weight: 700;
+}

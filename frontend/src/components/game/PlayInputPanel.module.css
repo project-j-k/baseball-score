@@ -1,0 +1,98 @@
+.panel {
+  background: var(--navy-800);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--navy-700);
+}
+
+.tab {
+  flex: 1;
+  height: 44px;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--navy-200);
+  background: var(--navy-900);
+  border-right: 1px solid var(--navy-700);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tab:last-child { border-right: none; }
+
+.tab.active {
+  background: var(--navy-700);
+  color: var(--accent-gold);
+  border-bottom: 2px solid var(--accent-gold);
+}
+
+.section {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pitchTypeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.pitchTypeBtn {
+  font-size: var(--font-sm) !important;
+  height: var(--btn-h-sm) !important;
+  padding: 0 8px !important;
+}
+
+.selectedType {
+  background: var(--navy-500) !important;
+  border-color: var(--navy-300) !important;
+  color: var(--white) !important;
+}
+
+.pitchResultRow {
+  display: flex;
+  gap: 8px;
+}
+
+.pitchLog {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 8px;
+  background: var(--navy-900);
+  border-radius: var(--radius-sm);
+}
+
+.pitchBadge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.ball   { background: var(--accent-green); }
+.strike { background: var(--accent-gold); color: var(--navy-900); }
+.foul   { background: var(--navy-500); }
+
+.resultTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.subGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}

@@ -1,0 +1,159 @@
+.wrap {
+  background: var(--navy-800);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-card);
+  flex-wrap: wrap;
+}
+
+/* イニング */
+.inning {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  min-width: 64px;
+}
+
+.halfArrow {
+  font-size: 20px;
+  color: var(--accent-gold);
+  line-height: 1;
+}
+
+.inningNum {
+  font-size: var(--font-2xl);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--white);
+}
+
+.inningLabel {
+  font-size: var(--font-sm);
+  color: var(--navy-200);
+}
+
+/* カウント */
+.counts {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.countGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.countLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy-200);
+  letter-spacing: 0.05em;
+}
+
+.dots {
+  display: flex;
+  gap: 5px;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid;
+  transition: background 0.15s;
+}
+
+.ball   { border-color: var(--accent-green-lt); }
+.strike { border-color: var(--accent-gold); }
+.out    { border-color: var(--accent-red); }
+
+.ball.on   { background: var(--accent-green-lt); }
+.strike.on { background: var(--accent-gold); }
+.out.on    { background: var(--accent-red); }
+
+/* ダイヤモンド */
+.diamond {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+}
+
+.diamondInner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.base2row {
+  display: flex;
+  justify-content: center;
+}
+
+.base13row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.base {
+  width: 20px;
+  height: 20px;
+  background: var(--navy-700);
+  border: 2px solid var(--navy-500);
+  transform: rotate(45deg);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.base.occupied {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold-dk);
+}
+
+.homeBase {
+  width: 16px;
+  height: 16px;
+  background: var(--navy-600);
+  border: 2px solid var(--navy-400);
+  border-radius: 3px;
+}
+
+/* 選手名 */
+.players {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.playerRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.playerLabel {
+  font-size: var(--font-sm);
+  color: var(--navy-300);
+  min-width: 36px;
+  font-weight: 600;
+}
+
+.playerName {
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: var(--white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
