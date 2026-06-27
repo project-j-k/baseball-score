@@ -3,6 +3,7 @@ import { ScoreBoard } from '../components/common/ScoreBoard';
 import { CountDisplay } from '../components/common/CountDisplay';
 import { PlayInputPanel } from '../components/game/PlayInputPanel';
 import { RunnerMoveDialog } from '../components/game/RunnerMoveDialog';
+import { PitcherPanel } from '../components/game/PitcherPanel';
 import type { PlayInput } from '../components/game/PlayInputPanel';
 import type { PendingMove } from '../store/gameStore';
 import type { RunnerMoveDecision } from '../store/runnerMoveLogic';
@@ -14,6 +15,7 @@ interface Props {
   onPlay: (input: PlayInput) => void;
   onConfirmMoves: (moves: RunnerMoveDecision[]) => void;
   onCancelMove: () => void;
+  onChangePitcher: (id: string) => void;
   onEndGame: () => void;
   connectedUsers: number;
 }
@@ -24,13 +26,12 @@ function getPlayerName(game: GameState, playerId: string): string {
   return p ? `#${p.number} ${p.name}` : '?';
 }
 
-export function GamePage({ game, pendingMove, onPlay, onConfirmMoves, onCancelMove, onEndGame, connectedUsers }: Props) {
+export function GamePage({ game, pendingMove, onPlay, onConfirmMoves, onCancelMove, onChangePitcher, onEndGame, connectedUsers }: Props) {
   const currentBatterName = getPlayerName(game, game.currentBatterId);
   const currentPitcherName = getPlayerName(game, game.currentPitcherId);
 
   return (
     <div className={styles.wrap}>
-      {/* ヘッダー */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <span className={styles.statusDot} />
@@ -39,12 +40,10 @@ export function GamePage({ game, pendingMove, onPlay, onConfirmMoves, onCancelMo
         <button className="btn btn-sm btn-ghost" onClick={onEndGame}>試合終了</button>
       </div>
 
-      {/* スコアボード */}
       <div className={styles.section}>
         <ScoreBoard game={game} />
       </div>
 
-      {/* カウント・走者 */}
       <div className={styles.section}>
         <CountDisplay
           count={game.count}
@@ -56,12 +55,14 @@ export function GamePage({ game, pendingMove, onPlay, onConfirmMoves, onCancelMo
         />
       </div>
 
-      {/* 入力パネル */}
+      <div className={styles.section}>
+        <PitcherPanel game={game} onChangePitcher={onChangePitcher} />
+      </div>
+
       <div className={styles.section}>
         <PlayInputPanel onCommit={onPlay} runners={game.runners} />
       </div>
 
-      {/* 走者移動ダイアログ */}
       {pendingMove && (
         <RunnerMoveDialog
           game={game}

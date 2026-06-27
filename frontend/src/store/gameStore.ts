@@ -3,9 +3,6 @@ import type { GameState, GameConfig, Team, HitType } from '../types/baseball';
 import type { PlayInput } from '../components/game/PlayInputPanel';
 import {
   createInitialGameState,
-  applyBall,
-  applyStrike,
-  applyFoul,
   addOut,
   applyWalk,
   applyHomerun,
@@ -13,44 +10,40 @@ import {
   checkColdGame,
 } from './gameLogic';
 import { applyRunnerMoves, type RunnerMoveDecision } from './runnerMoveLogic';
+import { recordPitches, changePitcher, type PitchRecord } from './pitcherLogic';
 
-// 安打後に走者移動ダイアログが必要か判定
 export type PendingMove = {
   hitType: HitType;
   batterId: string;
 } | null;
 
 export function buildInitialPlay(state: GameState, input: PlayInput): { newState: GameState; pending: PendingMove } {
+  // 投球記録を先に反映
+  const pitches: PitchRecord[] = input.pitches.map(p => ({
+    type: p.type,
+    result: p.result,
+  }));
+  const stateWithPitches = recordPitches(state, pitches);
+
   switch (input.resultType) {
     case 'hit': {
-      if (!input.hitType) return { newState: state, pending: null };
+      if (!input.hitType) return { newState: stateWithPitches, pending: null };
       if (input.hitType === 'homerun') {
-        return { newState: checkColdGame(applyHomerun(state)), pending: null };
+        return { newState: checkColdGame(applyHomerun(stateWithPitches)), pending: null };
       }
-      // 走者がいる、または打者が2塁以上に進む場合はダイアログを出す
-      // シンプルに常にダイアログを表示する（走者なし・単打でも打者の進塁を確認）
       return {
-        newState: state,
-        pending: { hitType: input.hitType, batterId: state.currentBatterId },
+        newState: stateWithPitches,
+        pending: { hitType: input.hitType, batterId: stateWithPitches.currentBatterId },
       };
     }
     case 'out':
-      return { newState: addOut(state), pending: null };
+      return { newState: addOut(stateWithPitches), pending: null };
     case 'walk':
-      return { newState: applyWalk(state), pending: null };
+      return { newState: applyWalk(stateWithPitches), pending: null };
     case 'hbp':
-      return { newState: advanceBatterToBase(state, 1), pending: null };
-    case 'stolen_base': {
-      // 盗塁：走者選択は別途実装（Phase 3後半）
-      return { newState: state, pending: null };
-    }
-    case 'wild_pitch':
-    case 'passed_ball': {
-      // 全走者+1塁（簡易実装）
-      return { newState: state, pending: null };
-    }
+      return { newState: advanceBatterToBase(stateWithPitches, 1), pending: null };
     default:
-      return { newState: state, pending: null };
+      return { newState: stateWithPitches, pending: null };
   }
 }
 
@@ -69,7 +62,7 @@ export function useGameStore() {
       const { newState, pending } = buildInitialPlay(prev, input);
       if (pending) {
         setPendingMove(pending);
-        return newState; // ダイアログ待ち（状態は変えない）
+        return newState;
       }
       return { ...newState, updatedAt: Date.now() };
     });
@@ -78,8 +71,7 @@ export function useGameStore() {
   const confirmRunnerMoves = useCallback((moves: RunnerMoveDecision[]) => {
     setGame(prev => {
       if (!prev) return prev;
-      const next = applyRunnerMoves(prev, moves);
-      return checkColdGame({ ...next, updatedAt: Date.now() });
+      return checkColdGame({ ...applyRunnerMoves(prev, moves), updatedAt: Date.now() });
     });
     setPendingMove(null);
   }, []);
@@ -88,9 +80,17 @@ export function useGameStore() {
     setPendingMove(null);
   }, []);
 
+  const handleChangePitcher = useCallback((newPitcherId: string) => {
+    setGame(prev => prev ? changePitcher(prev, newPitcherId) : prev);
+  }, []);
+
   const endGame = useCallback(() => {
     setGame(prev => prev ? { ...prev, status: 'finished', endReason: 'normal' } : prev);
   }, []);
 
-  return { game, pendingMove, connectedUsers, startGame, recordPlay, confirmRunnerMoves, cancelRunnerMove, endGame };
+  return {
+    game, pendingMove, connectedUsers,
+    startGame, recordPlay, confirmRunnerMoves, cancelRunnerMove,
+    handleChangePitcher, endGame,
+  };
 }
