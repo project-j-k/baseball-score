@@ -3,7 +3,6 @@ import {
   aggregateBattingStats,
   aggregatePitchingStats,
   mergeCareerStats,
-  type GameRecord,
   type AtBatLog,
   type PitchingLog,
 } from '../careerStats';

@@ -4,7 +4,7 @@ import { GameSetup } from './components/setup/GameSetup';
 import { GamePage } from './pages/GamePage';
 import { StatsPage } from './pages/StatsPage';
 import { useGameStore } from './store/gameStore';
-import { parseGameIdFromUrl, buildGameUrl } from './hooks/socketUtils';
+import { parseGameIdFromUrl } from './hooks/socketUtils';
 import { exportRecordsAsJson } from './store/careerStats';
 
 export default function App() {

@@ -51,14 +51,14 @@ export function GameSetup({ onStart }: Props) {
     else setVisitorTeam(t => ({ ...t, name }));
   };
 
-  const updatePlayerNumber = (team: Team, setTeam: React.Dispatch<React.SetStateAction<Team>>, playerId: string, number: number) => {
+  const updatePlayerNumber = (_team: Team, setTeam: React.Dispatch<React.SetStateAction<Team>>, playerId: string, number: number) => {
     setTeam(t => ({
       ...t,
       players: t.players.map(p => p.id === playerId ? { ...p, number } : p),
     }));
   };
 
-  const updatePlayerName = (team: Team, setTeam: React.Dispatch<React.SetStateAction<Team>>, playerId: string, name: string) => {
+  const updatePlayerName = (_team: Team, setTeam: React.Dispatch<React.SetStateAction<Team>>, playerId: string, name: string) => {
     setTeam(t => ({
       ...t,
       players: t.players.map(p => p.id === playerId ? { ...p, name: name || DUMMY_NAMES[t.players.indexOf(t.players.find(x => x.id === playerId)!)] || `選手${t.players.findIndex(x => x.id === playerId) + 1}` } : p),

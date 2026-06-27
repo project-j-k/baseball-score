@@ -11,7 +11,7 @@ import {
 } from './gameLogic';
 import { applyRunnerMoves, type RunnerMoveDecision } from './runnerMoveLogic';
 import { recordPitches, changePitcher, type PitchRecord, getAllPitcherStats } from './pitcherLogic';
-import { parseGameIdFromUrl, getBackendUrl } from '../hooks/socketUtils';
+import { parseGameIdFromUrl } from '../hooks/socketUtils';
 import { useSocket } from '../hooks/useSocket';
 import { saveGameRecord, type AtBatLog, type GameRecord } from './careerStats';
 

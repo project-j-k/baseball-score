@@ -1,5 +1,5 @@
 import type { GameState, Runner, HitType } from '../types/baseball';
-import { addOut, endHalf, checkWalkOff } from './gameLogic';
+import { endHalf, checkWalkOff } from './gameLogic';
 
 export type RunnerDestination = 1 | 2 | 3 | 'home' | 'out';
 

@@ -1,0 +1,86 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  # ========== フロントエンド: GitHub Pages ==========
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: フロントエンド依存関係インストール
+        working-directory: frontend
+        run: npm ci
+
+      - name: TypeScript型チェック
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: ユニットテスト
+        working-directory: frontend
+        run: npm test
+
+      - name: ビルド
+        working-directory: frontend
+        run: npm run build
+        env:
+          # GitHub Pagesのリポジトリ名に合わせて設定
+          # 例: /baseball-score/ （リポジトリ名がbaseball-scoreの場合）
+          VITE_BASE: /baseball-score/
+          # デプロイ済みRenderのURL（Secrets設定後に有効化）
+          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
+
+      - name: GitHub Pages設定
+        uses: actions/configure-pages@v4
+
+      - name: アーティファクトアップロード
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+      - name: GitHub Pagesデプロイ
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # ========== バックエンド: Render自動デプロイ（render.yamlで管理） ==========
+  # Renderはrender.yamlをリポジトリに置くだけで自動デプロイ
+  # このジョブはバックエンドのビルド確認のみ
+  verify-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: バックエンド依存関係インストール
+        working-directory: backend
+        run: npm ci
+
+      - name: TypeScript型チェック
+        working-directory: backend
+        run: npx tsc --noEmit

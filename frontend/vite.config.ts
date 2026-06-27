@@ -1,8 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+const base = process.env.VITE_BASE ?? '/'
+
 export default defineConfig({
   plugins: [react()],
+  base,
   server: {
     port: 5173,
     proxy: {
@@ -14,11 +17,5 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
-    exclude: ['node_modules', 'e2e/**'],
   },
 })

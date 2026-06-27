@@ -6,10 +6,8 @@ import {
   applyStrike,
   applyFoul,
   addOut,
-  endHalf,
   checkColdGame,
   checkWalkOff,
-  applyWalk,
   applyHomerun,
   advanceBatterToBase,
 } from '../gameLogic';

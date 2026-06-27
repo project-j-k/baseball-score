@@ -51,8 +51,7 @@ export function useSocket(): UseSocketReturn {
     socketRef.current?.emit('joinGame', gameId);
   }, []);
 
-  const leaveRoom = useCallback((gameId: string) => {
-    // Socket.io自動退室（disconnect時）
+  const leaveRoom = useCallback((_gameId: string) => {
     onStateRef.current = null;
   }, []);
 

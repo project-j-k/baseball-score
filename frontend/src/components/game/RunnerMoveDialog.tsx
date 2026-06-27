@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { GameState, HitType, Player } from '../../types/baseball';
+import type { GameState, HitType } from '../../types/baseball';
 import {
   buildDefaultRunnerMoves,
   getRunnerOptions,

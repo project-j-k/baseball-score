@@ -103,7 +103,7 @@ export function endHalf(state: GameState): GameState {
 // ========== コールドゲーム判定 ==========
 
 export function checkColdGame(state: GameState): GameState {
-  const { config, score, currentInning, currentHalf } = state;
+  const { config, score, currentInning } = state;
   if (!config.coldGameEnabled) return state;
   // イニング終了直後（次イニングに変わった後）に判定
   // completedInning = currentInning - 1 (bottomが終わったら)
