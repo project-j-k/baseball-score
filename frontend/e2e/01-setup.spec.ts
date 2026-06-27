@@ -22,6 +22,24 @@ test.describe('トップ画面', () => {
     await expect(page.getByRole('button', { name: '参加する' })).toBeVisible();
   });
 
+  test('生涯成績ボタンと説明テキストが重なっていない', async ({ page }) => {
+    await page.goto('/');
+    const statsBtn = page.getByRole('button', { name: '生涯成績を見る' });
+    const noteText = page.getByText(/個人情報は端末外/);
+    await expect(statsBtn).toBeVisible();
+    await expect(noteText).toBeVisible();
+
+    const btnBox = await statsBtn.boundingBox();
+    const noteBox = await noteText.boundingBox();
+    if (!btnBox || !noteBox) throw new Error('要素のboundingBoxが取得できない');
+
+    // ボタンとテキストが垂直方向に重なっていないことを確認
+    const btnBottom = btnBox.y + btnBox.height;
+    const noteBottom = noteBox.y + noteBox.height;
+    const overlap = Math.min(btnBottom, noteBottom) - Math.max(btnBox.y, noteBox.y);
+    expect(overlap, 'ボタンと説明テキストが重なっている').toBeLessThanOrEqual(0);
+  });
+
   test('短いコードでエラーが出る', async ({ page }) => {
     await page.goto('/');
     await page.locator('input[type="text"]').fill('ab');

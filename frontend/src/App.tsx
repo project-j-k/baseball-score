@@ -25,20 +25,12 @@ export default function App() {
 
   if (screen === 'join') {
     return (
-      <div style={{ position: 'relative' }}>
-        <GameJoin
-          initialGameId={urlGameId}
-          onCreateNew={createNewGame}
-          onJoin={joinExisting}
-        />
-        <button
-          className="btn btn-ghost btn-sm"
-          style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)' }}
-          onClick={() => setShowStats(true)}
-        >
-          生涯成績を見る
-        </button>
-      </div>
+      <GameJoin
+        initialGameId={urlGameId}
+        onCreateNew={createNewGame}
+        onJoin={joinExisting}
+        onShowStats={() => setShowStats(true)}
+      />
     );
   }
 

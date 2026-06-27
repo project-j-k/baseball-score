@@ -4,10 +4,11 @@ import styles from './GameJoin.module.css';
 interface Props {
   onCreateNew: () => void;
   onJoin: (gameId: string) => void;
+  onShowStats: () => void;
   initialGameId?: string | null;
 }
 
-export function GameJoin({ onCreateNew, onJoin, initialGameId }: Props) {
+export function GameJoin({ onCreateNew, onJoin, onShowStats, initialGameId }: Props) {
   const [code, setCode] = useState(initialGameId ?? '');
   const [error, setError] = useState('');
 
@@ -63,6 +64,14 @@ export function GameJoin({ onCreateNew, onJoin, initialGameId }: Props) {
       <p className={styles.note}>
         個人情報は端末外に送信されないわ。選手名もダミー名が使えるわよ。
       </p>
+
+      <button
+        className="btn btn-ghost btn-sm"
+        style={{ marginTop: 8 }}
+        onClick={onShowStats}
+      >
+        生涯成績を見る
+      </button>
     </div>
   );
 }
