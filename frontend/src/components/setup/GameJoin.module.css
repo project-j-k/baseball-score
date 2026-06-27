@@ -1,0 +1,81 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 32px 20px;
+  gap: 24px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.ball {
+  font-size: 64px;
+  line-height: 1;
+}
+
+.title {
+  font-size: var(--font-2xl);
+  font-weight: 900;
+  color: var(--white);
+}
+
+.sub {
+  font-size: var(--font-sm);
+  color: var(--navy-200);
+  text-align: center;
+}
+
+.card {
+  width: 100%;
+  background: var(--navy-800);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--navy-400);
+  font-size: var(--font-sm);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--navy-600);
+}
+
+.joinSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.error {
+  color: var(--accent-red);
+  font-size: var(--font-sm);
+  margin-top: 2px;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--navy-400);
+  text-align: center;
+  line-height: 1.6;
+}
