@@ -2,12 +2,18 @@ import type { GameState } from '../types/baseball';
 import { ScoreBoard } from '../components/common/ScoreBoard';
 import { CountDisplay } from '../components/common/CountDisplay';
 import { PlayInputPanel } from '../components/game/PlayInputPanel';
+import { RunnerMoveDialog } from '../components/game/RunnerMoveDialog';
 import type { PlayInput } from '../components/game/PlayInputPanel';
+import type { PendingMove } from '../store/gameStore';
+import type { RunnerMoveDecision } from '../store/runnerMoveLogic';
 import styles from './GamePage.module.css';
 
 interface Props {
   game: GameState;
+  pendingMove: PendingMove;
   onPlay: (input: PlayInput) => void;
+  onConfirmMoves: (moves: RunnerMoveDecision[]) => void;
+  onCancelMove: () => void;
   onEndGame: () => void;
   connectedUsers: number;
 }
@@ -18,7 +24,7 @@ function getPlayerName(game: GameState, playerId: string): string {
   return p ? `#${p.number} ${p.name}` : '?';
 }
 
-export function GamePage({ game, onPlay, onEndGame, connectedUsers }: Props) {
+export function GamePage({ game, pendingMove, onPlay, onConfirmMoves, onCancelMove, onEndGame, connectedUsers }: Props) {
   const currentBatterName = getPlayerName(game, game.currentBatterId);
   const currentPitcherName = getPlayerName(game, game.currentPitcherId);
 
@@ -54,6 +60,17 @@ export function GamePage({ game, onPlay, onEndGame, connectedUsers }: Props) {
       <div className={styles.section}>
         <PlayInputPanel onCommit={onPlay} runners={game.runners} />
       </div>
+
+      {/* 走者移動ダイアログ */}
+      {pendingMove && (
+        <RunnerMoveDialog
+          game={game}
+          hitType={pendingMove.hitType}
+          batterId={pendingMove.batterId}
+          onConfirm={onConfirmMoves}
+          onCancel={onCancelMove}
+        />
+      )}
     </div>
   );
 }

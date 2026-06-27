@@ -1,0 +1,122 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 13, 26, 0.88);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  padding: 0;
+}
+
+.dialog {
+  background: var(--navy-800);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  width: 100%;
+  max-width: 480px;
+  padding: 20px 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: var(--font-xl);
+  font-weight: 900;
+  color: var(--accent-gold);
+}
+
+.sub {
+  font-size: var(--font-sm);
+  color: var(--navy-200);
+}
+
+.runnerList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.runnerSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--navy-700);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.runnerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.runnerName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-base);
+  font-weight: 700;
+  color: var(--white);
+}
+
+.fromBadge {
+  background: var(--navy-500);
+  color: var(--navy-100);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.optionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.optionBtn {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  border: 2px solid transparent;
+  background: var(--navy-600);
+  color: var(--navy-100);
+}
+
+.optionBtn:active { transform: scale(0.95); }
+
+/* 選択済み */
+.optionBtn.selected.base  { background: var(--navy-400); border-color: var(--navy-200); color: var(--white); }
+.optionBtn.selected.home  { background: var(--accent-green); border-color: var(--accent-green-lt); color: var(--white); }
+.optionBtn.selected.outDest { background: var(--accent-red); border-color: var(--accent-red-dk); color: var(--white); }
+
+/* 未選択時の色hint */
+.optionBtn.home  { color: var(--accent-green-lt); }
+.optionBtn.outDest { color: var(--accent-red); }
+
+.dest {
+  font-weight: 900;
+  font-size: var(--font-base);
+}
+.dest.home { color: var(--accent-green-lt); }
+
+.footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
