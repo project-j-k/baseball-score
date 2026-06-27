@@ -92,6 +92,10 @@
 .smallInput {
   width: 64px !important;
   text-align: center;
+  color: var(--white) !important;
+  background: var(--navy-700) !important;
+  font-weight: 700;
+  font-size: var(--font-lg) !important;
 }
 
 .teamEditor {
