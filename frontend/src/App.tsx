@@ -3,6 +3,7 @@ import { GameJoin } from './components/setup/GameJoin';
 import { GameSetup } from './components/setup/GameSetup';
 import { GamePage } from './pages/GamePage';
 import { StatsPage } from './pages/StatsPage';
+import { StatsPasscode } from './components/stats/StatsPasscode';
 import { useGameStore } from './store/gameStore';
 import { parseGameIdFromUrl } from './hooks/socketUtils';
 import { exportRecordsAsJson } from './store/careerStats';
@@ -17,10 +18,20 @@ export default function App() {
   } = useGameStore();
 
   const [showStats, setShowStats] = useState(false);
+  const [statsUnlocked, setStatsUnlocked] = useState(false);
   const urlGameId = parseGameIdFromUrl(window.location.href);
 
-  if (showStats) {
-    return <StatsPage onBack={() => setShowStats(false)} />;
+  if (showStats && !statsUnlocked) {
+    return (
+      <StatsPasscode
+        onUnlock={() => setStatsUnlocked(true)}
+        onBack={() => setShowStats(false)}
+      />
+    );
+  }
+
+  if (showStats && statsUnlocked) {
+    return <StatsPage onBack={() => { setShowStats(false); setStatsUnlocked(false); }} />;
   }
 
   if (screen === 'join') {

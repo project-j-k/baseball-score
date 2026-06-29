@@ -48,8 +48,9 @@ jobs:
           # GitHub Pagesのリポジトリ名に合わせて設定
           # 例: /baseball-score/ （リポジトリ名がbaseball-scoreの場合）
           VITE_BASE: /baseball-score/
-          # デプロイ済みRenderのURL（Secrets設定後に有効化）
           VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
+          # 生涯成績ページの合言葉ハッシュ（未設定ならロックなし）
+          VITE_STATS_PASSCODE_HASH: ${{ secrets.VITE_STATS_PASSCODE_HASH }}
 
       - name: GitHub Pages設定
         uses: actions/configure-pages@v4
