@@ -10,7 +10,7 @@ import styles from './RunnerMoveDialog.module.css';
 
 interface Props {
   game: GameState;
-  hitType: HitType;
+  hitType: HitType | 'stolen_base';
   batterId: string;
   onConfirm: (moves: RunnerMoveDecision[]) => void;
   onCancel: () => void;
@@ -25,12 +25,13 @@ const BASE_LABEL: Record<string, string> = {
   batter: '打者',
 };
 
-const HIT_LABEL: Record<HitType, string> = {
+const HIT_LABEL: Record<HitType | 'stolen_base', string> = {
   single: '単打',
   infield_single: '内野安打',
   double: '二塁打',
   triple: '三塁打',
   homerun: 'ホームラン',
+  stolen_base: '盗塁',
 };
 
 function getPlayerName(game: GameState, playerId: string): string {
@@ -40,7 +41,10 @@ function getPlayerName(game: GameState, playerId: string): string {
 }
 
 export function RunnerMoveDialog({ game, hitType, batterId, onConfirm, onCancel }: Props) {
-  const defaultMoves = buildDefaultRunnerMoves(game.runners, hitType, batterId);
+  // 盗塁モード: 走者のみ表示（打者を含まない、デフォルトは現在地=stay）
+  const defaultMoves: RunnerMoveDecision[] = hitType === 'stolen_base'
+    ? game.runners.map(r => ({ playerId: r.playerId, fromBase: r.base, toBase: r.base }))
+    : buildDefaultRunnerMoves(game.runners, hitType as HitType, batterId);
   const [moves, setMoves] = useState<RunnerMoveDecision[]>(defaultMoves);
 
   // ホームランは確認不要（全員生還）

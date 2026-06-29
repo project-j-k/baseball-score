@@ -7,6 +7,7 @@ import {
   applyWalk,
   applyHomerun,
   advanceBatterToBase,
+  applyAllRunnersAdvance,
   checkColdGame,
 } from './gameLogic';
 import { applyRunnerMoves, type RunnerMoveDecision } from './runnerMoveLogic';
@@ -18,6 +19,8 @@ import { saveGameRecord, type AtBatLog, type GameRecord } from './careerStats';
 export type PendingMove = {
   hitType: HitType;
   batterId: string;
+} | {
+  type: 'stolen_base';
 } | null;
 
 export type AppScreen = 'join' | 'setup' | 'game' | 'finished';
@@ -64,6 +67,16 @@ export function buildInitialPlay(state: GameState, input: PlayInput): { newState
     case 'hbp': {
       const s = appendAtBatLog(stateWithPitches, { ...baseLog, result: 'hbp', rbis: 0 });
       return { newState: advanceBatterToBase(s, 1), pending: null };
+    }
+    case 'wild_pitch':
+    case 'passed_ball': {
+      // 全走者が1つ進む。打者のカウントは変わらない
+      return { newState: applyAllRunnersAdvance(stateWithPitches), pending: null };
+    }
+    case 'stolen_base': {
+      // 盗塁：走者選択ダイアログを出す（hitと同じRunnerMoveDialogを流用）
+      if (state.runners.length === 0) return { newState: stateWithPitches, pending: null };
+      return { newState: stateWithPitches, pending: { type: 'stolen_base' } };
     }
     default:
       return { newState: stateWithPitches, pending: null };

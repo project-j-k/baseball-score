@@ -1,5 +1,5 @@
 import type { GameState, Runner, HitType } from '../types/baseball';
-import { endHalf, checkWalkOff } from './gameLogic';
+import { endHalf, checkWalkOff, advanceBatter } from './gameLogic';
 
 export type RunnerDestination = 1 | 2 | 3 | 'home' | 'out';
 
@@ -46,6 +46,13 @@ export function applyRunnerMoves(state: GameState, moves: RunnerMoveDecision[]):
     playerId: m.playerId,
     base: m.toBase,
   }));
+
+  // 打者(fromBase:'batter')の移動が含まれる場合は次打者へ進めてカウントをリセット
+  const batterMoved = moves.some(m => m.fromBase === 'batter');
+  if (batterMoved) {
+    const next = advanceBatter(s);
+    return { ...next, runners: newRunners, count: { balls: 0, strikes: 0, outs: next.count.outs }, updatedAt: Date.now() };
+  }
 
   return { ...s, runners: newRunners, updatedAt: Date.now() };
 }

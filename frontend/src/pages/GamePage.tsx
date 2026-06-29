@@ -82,11 +82,21 @@ export function GamePage({
         </div>
       )}
 
-      {pendingMove && isHost && (
+      {pendingMove && isHost && 'hitType' in pendingMove && (
         <RunnerMoveDialog
           game={game}
           hitType={pendingMove.hitType}
           batterId={pendingMove.batterId}
+          onConfirm={onConfirmMoves}
+          onCancel={onCancelMove}
+        />
+      )}
+
+      {pendingMove && isHost && 'type' in pendingMove && pendingMove.type === 'stolen_base' && (
+        <RunnerMoveDialog
+          game={game}
+          hitType="stolen_base"
+          batterId=""
           onConfirm={onConfirmMoves}
           onCancel={onCancelMove}
         />

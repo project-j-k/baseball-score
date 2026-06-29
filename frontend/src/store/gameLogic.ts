@@ -80,9 +80,31 @@ export function endHalf(state: GameState): GameState {
   const nextHalf: Half = isTop ? 'bottom' : 'top';
   const nextInning = isTop ? state.currentInning : state.currentInning + 1;
 
+  // 終了したハーフのスコアを記録
+  const runsThisHalf = isTop ? state.score.visitor : state.score.home;
+  const completedHalf = {
+    inning: state.currentInning,
+    half: state.currentHalf,
+    plays: [],
+    runs: 0,
+    hits: 0,
+    errors: 0,
+    completed: true,
+  };
+  // このイニングのこのハーフの得点（累計スコアから前イニングまでの合計を引く）
+  const prevInningRuns = state.innings
+    .filter(h => h.half === state.currentHalf && h.completed)
+    .reduce((sum, h) => sum + h.runs, 0);
+  completedHalf.runs = runsThisHalf - prevInningRuns;
+
+  const newInnings = [
+    ...state.innings.filter(h => !(h.inning === state.currentInning && h.half === state.currentHalf)),
+    completedHalf,
+  ];
+
   // 最終イニング後の表の処理（コールド・サヨナラは別途判定）
   if (!isTop && nextInning > state.config.maxInnings) {
-    return { ...state, status: 'finished', endReason: 'normal' };
+    return { ...state, innings: newInnings, status: 'finished', endReason: 'normal' };
   }
 
   const nextBattingTeam = nextHalf === 'top' ? state.visitorTeam : state.homeTeam;
@@ -90,6 +112,7 @@ export function endHalf(state: GameState): GameState {
 
   return {
     ...state,
+    innings: newInnings,
     currentInning: nextInning,
     currentHalf: nextHalf,
     count: { balls: 0, strikes: 0, outs: 0 },
@@ -138,38 +161,43 @@ export function applyWalk(state: GameState): GameState {
 
 export function advanceBatterToBase(state: GameState, base: 1 | 2 | 3): GameState {
   const batter: Runner = { playerId: state.currentBatterId, base };
-  const runners = compressRunners([...state.runners, batter]);
+  const { runners, runsScored } = compressRunners([...state.runners, batter]);
   const next = advanceBatter(state);
-  return {
-    ...next,
-    runners,
-    count: { balls: 0, strikes: 0, outs: next.count.outs },
-  };
+  const side = state.currentHalf === 'top' ? 'visitor' : 'home';
+  const newScore = runsScored > 0
+    ? { ...state.score, [side]: state.score[side] + runsScored }
+    : state.score;
+  let result = { ...next, runners, score: newScore, count: { balls: 0, strikes: 0, outs: next.count.outs } };
+  if (runsScored > 0) result = checkWalkOff(result) as typeof result;
+  return result;
 }
 
 // 走者が重複した場合、より先の塁に進める（押し出し）
-function compressRunners(runners: Runner[]): Runner[] {
-  // 重複塁を解消（後から来た走者が押し出す）
+function compressRunners(runners: Runner[]): { runners: Runner[]; runsScored: number } {
   const sorted = [...runners].sort((a, b) => b.base - a.base);
   const result: Runner[] = [];
+  let runsScored = 0;
   for (const r of sorted) {
     const occupied = result.find(x => x.base === r.base);
     if (occupied) {
-      // 押し出し：先の走者を1つ進める
-      const pushed = result.find(x => x.base === r.base);
-      if (pushed && pushed.base < 3) {
-        pushed.base = (pushed.base + 1) as 1 | 2 | 3;
-      } else if (pushed && pushed.base === 3) {
-        // 本塁へ押し出し（得点）
-        result.splice(result.indexOf(pushed), 1);
-        // TODO: 得点加算（Phase 3で詳細実装）
+      if (occupied.base < 3) {
+        occupied.base = (occupied.base + 1) as 1 | 2 | 3;
+        // 押し出した先でまた重複するか再帰的に解消
+        const again = compressRunners(result);
+        result.length = 0;
+        result.push(...again.runners);
+        runsScored += again.runsScored;
+      } else {
+        // 3塁走者が本塁へ押し出し→得点
+        result.splice(result.indexOf(occupied), 1);
+        runsScored++;
       }
       result.push(r);
     } else {
       result.push(r);
     }
   }
-  return result.filter(r => r.base >= 1 && r.base <= 3) as Runner[];
+  return { runners: result.filter(r => r.base >= 1 && r.base <= 3) as Runner[], runsScored };
 }
 
 // ========== ホームラン ==========
@@ -212,6 +240,52 @@ export function applyStrike(state: GameState): GameState {
     return addOut(state);
   }
   return { ...state, count: { ...state.count, strikes: state.count.strikes + 1 } };
+}
+
+// ========== 全走者を1つ進める（暴投・捕逸用） ==========
+
+export function applyAllRunnersAdvance(state: GameState): GameState {
+  if (state.runners.length === 0) return state;
+  let s = state;
+  let runsScored = 0;
+  const newRunners: Runner[] = [];
+  for (const r of state.runners) {
+    if (r.base === 3) {
+      runsScored++;
+    } else {
+      newRunners.push({ ...r, base: (r.base + 1) as 1 | 2 | 3 });
+    }
+  }
+  if (runsScored > 0) {
+    const side = s.currentHalf === 'top' ? 'visitor' : 'home';
+    s = { ...s, score: { ...s.score, [side]: s.score[side] + runsScored } };
+    s = checkWalkOff(s);
+    if (s.status === 'finished') return { ...s, runners: newRunners };
+  }
+  return { ...s, runners: newRunners };
+}
+
+// ========== 走者1人を指定塁に進める（盗塁・暴投・捕逸用） ==========
+
+export function applyRunnerAdvance(
+  state: GameState,
+  playerId: string | null,
+  toBase: 1 | 2 | 3 | 'home' | null,
+): GameState {
+  if (!playerId || toBase === null) return state;
+
+  if (toBase === 'home') {
+    // 生還→得点加算、走者から除去
+    const side = state.currentHalf === 'top' ? 'visitor' : 'home';
+    const newScore = { ...state.score, [side]: state.score[side] + 1 };
+    const newRunners = state.runners.filter(r => r.playerId !== playerId);
+    return checkWalkOff({ ...state, score: newScore, runners: newRunners });
+  }
+
+  const newRunners = state.runners.map(r =>
+    r.playerId === playerId ? { ...r, base: toBase } : r
+  );
+  return { ...state, runners: newRunners };
 }
 
 // ========== ファウル ==========

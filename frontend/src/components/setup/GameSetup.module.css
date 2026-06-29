@@ -90,12 +90,18 @@
 }
 
 .smallInput {
-  width: 64px !important;
+  width: 72px !important;
+  min-width: 72px;
   text-align: center;
   color: var(--white) !important;
-  background: var(--navy-700) !important;
+  background: var(--navy-800) !important;
   font-weight: 700;
   font-size: var(--font-lg) !important;
+}
+
+.coldGameDisabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 .teamEditor {

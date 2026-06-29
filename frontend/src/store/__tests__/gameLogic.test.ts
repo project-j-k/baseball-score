@@ -150,6 +150,37 @@ describe('走者', () => {
   });
 });
 
+// ========== 押し出し四球 ==========
+
+describe('押し出し四球', () => {
+  it('満塁でボール4球目→3塁走者が生還して1点入る', () => {
+    let s: GameState = {
+      ...state,
+      runners: [
+        { playerId: 'visitor-2', base: 1 },
+        { playerId: 'visitor-3', base: 2 },
+        { playerId: 'visitor-4', base: 3 },
+      ],
+    };
+    s = applyBall(applyBall(applyBall(s))); // 3ボール
+    s = applyBall(s); // 4球目→四球
+    expect(s.score.visitor).toBe(1); // 押し出し1点
+    expect(s.runners).toHaveLength(3); // 満塁継続
+    expect(s.runners.find(r => r.playerId === 'visitor-4')).toBeUndefined(); // 生還済み
+  });
+
+  it('1塁のみの四球は押し出しにならない', () => {
+    let s: GameState = {
+      ...state,
+      runners: [{ playerId: 'visitor-2', base: 1 }],
+    };
+    s = applyBall(applyBall(applyBall(s)));
+    s = applyBall(s);
+    expect(s.score.visitor).toBe(0);
+    expect(s.runners).toHaveLength(2); // 1塁・2塁
+  });
+});
+
 // ========== コールドゲーム ==========
 
 describe('コールドゲーム', () => {
@@ -184,6 +215,54 @@ describe('コールドゲーム', () => {
     };
     s = checkColdGame(s);
     expect(s.status).toBe('active');
+  });
+});
+
+// ========== イニング別スコア記録 ==========
+
+describe('イニング別スコア記録', () => {
+  it('3アウト後にinningsに当該ハーフが追加される', () => {
+    const s = addOut(addOut(addOut(state))); // 1回表終了
+    expect(s.innings.some(h => h.inning === 1 && h.half === 'top')).toBe(true);
+  });
+
+  it('1回表終了後のinningsエントリはruns=0・completed=true', () => {
+    const s = addOut(addOut(addOut(state)));
+    const half = s.innings.find(h => h.inning === 1 && h.half === 'top');
+    expect(half?.runs).toBe(0);
+    expect(half?.completed).toBe(true);
+  });
+
+  it('ホームランで得点が入ったイニングのrunsが正しく記録される', () => {
+    let s = applyHomerun(state); // 1点
+    s = addOut(addOut(addOut(s))); // 1回表終了
+    const half = s.innings.find(h => h.inning === 1 && h.half === 'top');
+    expect(half?.runs).toBe(1);
+  });
+});
+
+// ========== 盗塁・暴投・捕逸 ==========
+
+import { applyRunnerAdvance } from '../gameLogic';
+
+describe('盗塁・暴投・捕逸（走者1人進塁）', () => {
+  it('1塁走者が盗塁で2塁に進む', () => {
+    const s = { ...state, runners: [{ playerId: 'visitor-1', base: 1 as const }] };
+    const result = applyRunnerAdvance(s, 'visitor-1', 2);
+    expect(result.runners.find(r => r.playerId === 'visitor-1')?.base).toBe(2);
+    expect(result.currentBatterId).toBe(s.currentBatterId); // 打者は変わらない
+  });
+
+  it('3塁走者が暴投で生還して1点入る', () => {
+    const s = { ...state, runners: [{ playerId: 'visitor-1', base: 3 as const }] };
+    const result = applyRunnerAdvance(s, 'visitor-1', 'home');
+    expect(result.runners).toHaveLength(0);
+    expect(result.score.visitor).toBe(1);
+  });
+
+  it('走者なしの暴投はカウント変化なし', () => {
+    const result = applyRunnerAdvance(state, null, null);
+    expect(result).toEqual(state);
   });
 });
 

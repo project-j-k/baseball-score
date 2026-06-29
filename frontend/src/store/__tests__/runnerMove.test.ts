@@ -106,6 +106,41 @@ describe('applyRunnerMoves', () => {
     expect(result.endReason).toBe('walk_off');
     expect(result.score.home).toBe(5);
   });
+
+  // ===== Task #2&#38;6: ヒット後の打者進塁・カウントリセット =====
+
+  it('ヒット後の走者確定で打者が次打者に進む', () => {
+    const state: GameState = { ...base };
+    expect(state.currentBatterId).toBe('visitor-1');
+    const moves: RunnerMoveDecision[] = [
+      { playerId: 'visitor-1', fromBase: 'batter', toBase: 1 },
+    ];
+    const result = applyRunnerMoves(state, moves);
+    expect(result.currentBatterId).toBe('visitor-2');
+    expect(result.count.balls).toBe(0);
+    expect(result.count.strikes).toBe(0);
+  });
+
+  it('ヒット後の打者が指定塁の走者として残る', () => {
+    const state: GameState = { ...base };
+    const moves: RunnerMoveDecision[] = [
+      { playerId: 'visitor-1', fromBase: 'batter', toBase: 1 },
+    ];
+    const result = applyRunnerMoves(state, moves);
+    expect(result.runners.some(r => r.playerId === 'visitor-1' && r.base === 1)).toBe(true);
+  });
+
+  it('2塁打で打者が2塁に進み次打者へ切り替わる', () => {
+    const state: GameState = { ...base, runners: [{ playerId: 'visitor-2', base: 1 }] };
+    const moves: RunnerMoveDecision[] = [
+      { playerId: 'visitor-2', fromBase: 1, toBase: 3 },
+      { playerId: 'visitor-1', fromBase: 'batter', toBase: 2 },
+    ];
+    const result = applyRunnerMoves(state, moves);
+    expect(result.currentBatterId).toBe('visitor-2');
+    expect(result.runners.find(r => r.playerId === 'visitor-1')?.base).toBe(2);
+    expect(result.runners.find(r => r.playerId === 'visitor-2')?.base).toBe(3);
+  });
 });
 
 // ========== デフォルト進塁提案 ==========

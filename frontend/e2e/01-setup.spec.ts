@@ -88,4 +88,28 @@ test.describe('試合設定画面', () => {
     await page.getByRole('button', { name: '試合開始' }).click();
     await expect(page.locator('text=回')).toBeVisible();
   });
+
+  test('コールド無効にすると設定項目がdisabledになる', async ({ page }) => {
+    await page.getByRole('button', { name: /有効|無効/ }).click(); // トグル
+    // 無効になったら入力がdisabledになっている
+    const inningInput = page.locator('input[type="number"]').first();
+    const diffInput = page.locator('input[type="number"]').nth(1);
+    await expect(inningInput).toBeDisabled();
+    await expect(diffInput).toBeDisabled();
+  });
+
+  test('コールド有効時は設定項目がenabledになっている', async ({ page }) => {
+    const inningInput = page.locator('input[type="number"]').first();
+    const diffInput = page.locator('input[type="number"]').nth(1);
+    await expect(inningInput).toBeEnabled();
+    await expect(diffInput).toBeEnabled();
+  });
+
+  test('コールド得点差に2桁入力できる', async ({ page }) => {
+    const diffInput = page.locator('input[type="number"]').nth(1);
+    await diffInput.fill('15');
+    await expect(diffInput).toHaveValue('15');
+    const box = await diffInput.boundingBox();
+    expect(box?.width).toBeGreaterThan(40); // 2桁が収まる幅
+  });
 });

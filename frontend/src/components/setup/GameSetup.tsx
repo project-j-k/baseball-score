@@ -162,32 +162,32 @@ export function GameSetup({ onStart }: Props) {
                   {config.coldGameEnabled ? '有効' : '無効'}
                 </button>
               </div>
-              {config.coldGameEnabled && (
-                <div className={styles.coldGameDetail}>
-                  <div className={styles.coldRow}>
-                    <label className="label" style={{ marginBottom: 0 }}>発動イニング（終了後）</label>
-                    <input
-                      type="number"
-                      className={styles.smallInput}
-                      value={config.coldGameInning}
-                      min={3} max={8}
-                      onChange={e => setConfig(c => ({ ...c, coldGameInning: Number(e.target.value) }))}
-                    />
-                    <span>回</span>
-                  </div>
-                  <div className={styles.coldRow}>
-                    <label className="label" style={{ marginBottom: 0 }}>得点差</label>
-                    <input
-                      type="number"
-                      className={styles.smallInput}
-                      value={config.coldGameDifference}
-                      min={5} max={20}
-                      onChange={e => setConfig(c => ({ ...c, coldGameDifference: Number(e.target.value) }))}
-                    />
-                    <span>点</span>
-                  </div>
+              <div className={`${styles.coldGameDetail} ${!config.coldGameEnabled ? styles.coldGameDisabled : ''}`}>
+                <div className={styles.coldRow}>
+                  <label className="label" style={{ marginBottom: 0 }}>発動イニング（終了後）</label>
+                  <input
+                    type="number"
+                    className={styles.smallInput}
+                    value={config.coldGameInning}
+                    min={3} max={8}
+                    disabled={!config.coldGameEnabled}
+                    onChange={e => setConfig(c => ({ ...c, coldGameInning: Number(e.target.value) }))}
+                  />
+                  <span>回</span>
                 </div>
-              )}
+                <div className={styles.coldRow}>
+                  <label className="label" style={{ marginBottom: 0 }}>得点差</label>
+                  <input
+                    type="number"
+                    className={styles.smallInput}
+                    value={config.coldGameDifference}
+                    min={5} max={20}
+                    disabled={!config.coldGameEnabled}
+                    onChange={e => setConfig(c => ({ ...c, coldGameDifference: Number(e.target.value) }))}
+                  />
+                  <span>点</span>
+                </div>
+              </div>
             </div>
           </div>
         )}
